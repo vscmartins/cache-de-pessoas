@@ -80,7 +80,7 @@ void main() {
             cache.remove(0);
         }
         cache.add(achada);
-        println("Pessoa buscada no banco e adicionada ao cache: " + achada);
+        println("Pessoa buscada no banco e adicionada ao cache: "+"\n"  + achada);
     }
 
 
