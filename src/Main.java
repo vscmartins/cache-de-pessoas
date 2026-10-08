@@ -1,51 +1,101 @@
 import static java.lang.IO.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-// Configuração inicial do limite do cache
-final int LIMITE_CACHE = 10;
-
 void main() {
 
     List<Pessoa> banco = new ArrayList<>();
     List<Pessoa> cache = new ArrayList<>();
 
+    // dados mockados do banco
     banco.add(new Pessoa(1, "Ana", 25));
     banco.add(new Pessoa(2, "Bruno", 30));
     banco.add(new Pessoa(3, "Carla", 22));
     banco.add(new Pessoa(4, "Diego", 28));
     banco.add(new Pessoa(5, "Elisa", 35));
-    banco.add(new Pessoa(6, "Felipe", 27));
-    banco.add(new Pessoa(7, "Gabriela", 31));
-    banco.add(new Pessoa(8, "Hugo", 24));
-    banco.add(new Pessoa(9, "Isabela", 29));
-    banco.add(new Pessoa(10, "João", 33));
-    banco.add(new Pessoa(11, "Karen", 26));
-    banco.add(new Pessoa(12, "Lucas", 21));
+
+    while (true) {
+        int opcao = Integer.parseInt(readln("\n|        MENU         |" +
+                                                   "\n|1 - Buscar pessoa    |" +
+                                                   "\n|2 - Cadastrar pessoa |" +
+                                                   "\n|3 - Mostrar cache    |" +
+                                                   "\n|0 - Sair: "));
+
+        if (opcao == 0) {
+            break;
+        }
+
+        if (opcao == 3) {
+            if (cache.isEmpty()) {
+                println("Cache vazio.");
+            } else {
+                println("Cache atual (" + cache.size() + "/10):");
+                for (Pessoa p : cache) {
+                    println(p.toString());
+                }
+            }
+            continue;
+        }
 
 
-    // O metodo readln aceita uma mensagem de texto diretamente como prompt
-    String input = readln("Digite o ID da pessoa: ");
-    int id = Integer.parseInt(input.trim());
+        if (opcao == 2) {
+            String nome = readln("Digite o nome: ");
+            int idade = Integer.parseInt(readln("Digite a idade: "));
+            Pessoa nova = new Pessoa(banco.size() + 1, nome, idade);
+            banco.add(nova);
+            println("Pessoa cadastrada no banco: " + nova);
+            continue;
+        }
 
-    Pessoa pessoa = BuscaPessoa.buscarPorId(cache, id);
-    if (pessoa != null) {
-        cache.remove(pessoa);
-        cache.add(pessoa);
-        println("Pessoa encontrada no cache: " + pessoa);
-        return;
+        if (opcao != 1) {
+            println("Opcao invalida.");
+            continue;
+        }
+
+
+        int id = Integer.parseInt(readln("Digite o ID da pessoa: "));
+
+        Pessoa achada = null;
+        for (Pessoa p : cache) {
+            if (p.getId() == id) {
+                achada = p;
+            }
+        }
+        if (achada != null) {
+            println("Pessoa encontrada no cache: " + achada);
+            continue;
+        }
+
+
+        for (Pessoa p : banco) {
+            if (p.getId() == id) {
+                achada = p;
+            }
+        }
+        if (achada == null) {
+            println("Pessoa nao encontrada no banco.");
+            continue;
+        }
+
+
+        if (cache.size() == 10) {
+            cache.remove(0);
+        }
+        cache.add(achada);
+        println("Pessoa buscada no banco e adicionada ao cache: " + achada);
     }
 
 
-    pessoa = BuscaPessoa.buscarPorId(banco, id);
-    if (pessoa != null) {
-        if (cache.size() == LIMITE_CACHE) {
-            cache.remove(0); // Remove o elemento mais antigo do cache (FIFO simples)
+    if (!cache.isEmpty()) {
+        println("\nCache final:");
+        for (Pessoa p : cache) {
+            println(p.toString());
         }
-        cache.add(pessoa);
-        println("Pessoa buscada no banco e adicionada ao cache: " + pessoa);
     } else {
-        println("Pessoa não encontrada no banco.");
+
+        println("\nCache vazio. Ultimos inseridos:");
+        int inicio = Math.max(0, banco.size() - 10);
+        for (int i = inicio; i < banco.size(); i++) {
+            println(banco.get(i).toString());
+        }
     }
 }
+
